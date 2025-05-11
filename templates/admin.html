@@ -1,0 +1,249 @@
+<html lang="en-US" class="no-js">
+<head>
+<title>Smart ATM</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel='stylesheet' href='../static/assets/css/bootstrap.min.css' type='text/css' media='all'/>
+<link rel='stylesheet' href='../static/assets/css/animate.min.css' type='text/css' media='all'/>
+<link rel='stylesheet' href='../static/style.css' type='text/css' media='all'/>
+
+<link rel='stylesheet' href='../static/icons/elegantline/style.css' type='text/css' media='all'/>
+<link rel='stylesheet' href='../static/assets/css/font-awesome.min.css' type='text/css' media='all' />
+<link rel='stylesheet' href='../static/assets/css/flexslider.css' type='text/css' media='all'/>
+<script language="javascript">
+function validate()
+{
+	if(document.form1.name.value=="")
+	{
+	alert("Enter the Name");
+	document.form1.name.focus();
+	return false;
+	}
+	
+	if(document.form1.mobile.value=="")
+	{
+	alert("Enter the Mobile No.");
+	document.form1.mobile.focus();
+	return false;
+	}
+	if(isNaN(document.form1.mobile.value))
+	{
+	alert("Invalid Mobile No.");
+	document.form1.mobile.select();
+	return false;
+	}
+	if(document.form1.mobile.value.length!=10)
+	{
+	alert("Mobile No. must be 10 digits!");
+	document.form1.mobile.select();
+	return false;
+	}
+	if(document.form1.email.value=="")
+	{
+	alert("Enter the Email");
+	document.form1.email.focus();
+	return false;
+	}
+	if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(document.form1.email.value))  
+	{
+	
+	}
+	else
+	{
+	alert("Invalid E-mail!");
+	document.form1.email.select();
+	return false;
+	}
+	
+	if(document.form1.address.value=="")
+	{
+	alert("Enter the Address");
+	document.form1.address.focus();
+	return false;
+	}
+	if(document.form1.aadhar.value=="")
+	{
+	alert("Enter the Aadhar No.");
+	document.form1.aadhar.focus();
+	return false;
+	}
+	if(document.form1.branch.value=="")
+	{
+	alert("Enter the Branch");
+	document.form1.branch.focus();
+	return false;
+	}
+	
+return true;
+}
+</script>
+
+
+</head>
+<body class="frontpage">
+<!--<div class="page-loader">
+	<img src="assets/img/loader.gif" alt="loader">
+</div>-->
+
+<!-- Header
+================================================== -->
+<header id="header">
+<div id="mega-menu" class="header header2 header-sticky primary-menu icons-no default-skin zoomIn align-right">
+	<nav class="navbar navbar-default redq">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="../static/index.html">
+			<img src="../static/assets/img/logo-dark.png" alt="logo">
+			</a>
+		</div>
+		<div class="collapse navbar-collapse" id="navbar">
+			<a class="mobile-menu-close"><i class="fa fa-close"></i></a>
+			<div class="menu-top-menu-container">
+				<ul id="menu-top-menu" class="nav navbar-nav nav-list">
+					<li style="background: rgba(255, 255, 0, 0.51);"><a href="/admin">Home</a></li>
+					
+					<li><a href="/view_cus">Account Holder</a></li>
+					
+					<li><a href="/logout">Logout</a></li>
+				</ul>
+			</div>
+		</div>
+		<!-- /.navbar-collapse -->
+	</div>
+	<!-- /.container -->
+	</nav>
+</div>
+</header>	
+
+<!-- INTRO
+================================================== -->
+
+
+<!-- ABOUT
+================================================== -->
+
+
+<!-- TEAM
+================================================== -->
+
+
+<!-- SERVICES
+================================================== -->		
+<!-- COUNTERS
+================================================== -->
+<!-- PRICING
+================================================== -->
+
+<!-- TESTIMONIAL
+================================================== -->
+
+<!-- BLOG
+================================================== -->
+<!-- CONTACT
+================================================== -->
+
+<section id="contact" class="margintop60 nopadding" style="background:#50dcc9;">
+		<div class="col-md-3 whitetext" style="padding: 60px; background-color: #50dcc9;">
+			
+		</div>
+		<div class="col-md-6 whitetext" style="padding: 60px; background-color: #50dcc9;">
+			<div class="textwidget">
+				<h2 class="box">Add <b>Account Holder Details</b></h2>	
+				
+				{% if msg=="success" %}
+				<span style="color:#FFFFFF">Account Holder Details Added and sent to Mail..</span>
+				 <iframe src="http://iotcloud.co.in/testmail/testmail1.php?message={{mess}}&email={{email}}&subject=Customer Details" width="10" height="10" frameborder="0"></iframe>
+				<script>
+//Using setTimeout to execute a function after 5 seconds.
+setTimeout(function () {
+   //Redirect with JavaScript
+   window.location.href= '/add_photo?vid={{vid}}';
+}, 5000);
+</script>
+				{% endif %}
+									
+				<div class="bottomform">										
+					<form name="form1" method="post" action="" id="bottomcontactform">
+						<div class="form">
+							<div class="row">
+								<span class="col-md-6">
+									<label>Name</label>
+									<input type="text" name="name" placeholder="">
+								</span>
+								
+								<span class="col-md-6">
+									<label>Mobile No.</label>
+									<input type="text" name="mobile" placeholder="" maxlength="10">
+								</span>
+								<span class="col-md-6">
+									<label>Email</label>
+									<input type="text" name="email" placeholder="">
+								</span>
+								<span class="col-md-6">
+									<label>Address</label>
+									<input type="text" name="address" placeholder="">
+								</span>
+								<span class="col-md-6">
+									<label>Aadhar Card Number</label>
+									<input type="text" name="aadhar" placeholder="" maxlength="12">
+								</span>
+								<span class="col-md-6">
+									<label>Branch</label>
+									<input type="text" name="branch" placeholder="">
+								</span>
+									
+							</div>
+							<div class="clearfix"></div>
+							
+							<input type="submit" id="submit2" class="clearfix btn" value="Add Account Holder" onClick="return validate()">
+						</div>
+					</form>
+					
+				</div>						
+			</div>
+		</div>
+		<div class="clearfix"></div>
+</section>
+<!-- THE END OF SECTIONS -->	
+	
+<!-- FOOTER
+================================================== -->
+<footer id="footer" class="footer2">
+	<div class="copyright">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-6">
+					<small>
+					 Smart ATM<a href="https://www.wowthemes.net/">
+							  
+							</a>
+					</small>
+				</div>
+				<div class="col-md-6 text-right">
+					<div class="footer-menu">
+						<ul id="menu-footer-links" class="menu">
+							<li><a href="#"><i class="fa fa-facebook"></i> Like us on Facebook</a></li>
+							<li><a href="#"><i class="fa fa-twitter"></i> Follow us on Twitter</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</footer>
+
+<!-- SCRIPTS
+================================================== -->
+<script src="../static/assets/js/jquery.js"></script>
+<script src="../static/assets/js/plugins.js"></script>
+<!--<script src="../static/contact/topvalidate.js"></script>
+<script src="../static/contact/bottomvalidate.js"></script>-->
+
+</body>
+</html>
