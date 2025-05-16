@@ -57,6 +57,37 @@ def index():
 
     return render_template('index.html',msg=msg,act=act)
 
+@app.route('/verify_card',methods=['POST','GET'])
+def verify_card():
+    cnt=0
+    act=""
+    msg=""
+
+    ff11=open("facest.txt","w")
+    ff11.write("")
+    ff11.close()
+    
+    if request.method=='POST':
+        card=request.form['card']
+        
+        mycursor = mydb.cursor()
+        mycursor.execute("SELECT count(*) FROM register where card=%s",(card, ))
+        cnt = mycursor.fetchone()[0]
+        if cnt>0:
+            msg="success"
+            session['username'] = card
+            ff2=open("un.txt","w")
+            ff2.write(card)
+            ff2.close()
+            return redirect(url_for('verify_face'))
+       
+            
+        else:
+            msg="Card No. is wrong!"
+            print("Incorrect")
+        
+
+    return render_template('verify_card.html',msg=msg,act=act)
 
 #########################
 
@@ -832,6 +863,513 @@ def login():
     return render_template('login.html',value=value,msg=msg)
 
 
+
+@app.route('/userhome')
+def userhome():
+    uname=""
+    #if 'username' in session:
+    #    uname = session['username']
+    ff2=open("un.txt","r")
+    uname=ff2.read()
+    ff2.close() 
+
+    name=""
+    mycursor = mydb.cursor()
+    mycursor.execute("SELECT * FROM register where card=%s",(uname, ))
+    value = mycursor.fetchone()
+    
+
+    print(uname)
+    
+    mycursor.execute("SELECT * FROM register where card=%s",(uname, ))
+    value = mycursor.fetchone()
+    print(value)
+    name=value[1]  
+        
+    return render_template('userhome.html',name=name,value=value)
+
+'''@app.route('/deposit')
+def deposit():
+    return render_template('deposit.html')
+@app.route('/deposit_amount',methods=['POST','GET'])
+def deposit_amount():
+    if request.method=='POST':
+        name=request.form['name']
+        accountno=request.form['accno']
+        amount=request.form['amount']
+        today = date.today()
+        rdate = today.strftime("%b-%d-%Y")
+        mycursor = mydb.cursor()
+        mycursor.execute("SELECT max(id)+1 FROM event")
+        maxid = mycursor.fetchone()[0]
+        sql = "INSERT INTO event(id, name, accno, amount, rdate) VALUES (%s, %s, %s, %s, %s)"
+        val = (maxid, name, accountno, amount, rdate)
+        mycursor.execute(sql, val)
+        mydb.commit()   
+    return render_template('userhome.html')'''
+
+'''@app.route('/withdraw')
+def withdraw():
+
+    
+    return render_template('withdraw.html')'''
+
+@app.route('/verify_face',methods=['POST','GET'])
+def verify_face():
+    msg=""
+    ss=""
+    uname=""
+    act=""
+    if request.method=='GET':
+        act = request.args.get('act')
+        
+    #if 'username' in session:
+    #    uname = session['username']
+    ff2=open("un.txt","r")
+    uname=ff2.read()
+    ff2.close()
+    
+                
+    return render_template('verify_face.html',msg=msg)
+
+@app.route('/face',methods=['POST','GET'])
+def face():
+    msg=""
+    ss=""
+    uname=""
+    act=""
+    if request.method=='GET':
+        act = request.args.get('act')
+        
+    #if 'username' in session:
+    #    uname = session['username']
+    ff2=open("un.txt","r")
+    uname=ff2.read()
+    ff2.close()
+    print("uname="+uname)
+    shutil.copy('static/faces/f1.jpg', 'static/f1.jpg')
+
+    ff3=open("img.txt","r")
+    mcnt=ff3.read()
+    ff3.close()
+
+    mcnt1=int(mcnt)
+    if mcnt1==2:
+        msg="Face Detected"
+    elif mcnt1>2:
+        msg="Multiple Face Detected!"
+    else:
+        msg=""
+   
+    
+    
+                
+    return render_template('face.html',msg=msg,act=act,mcnt1=mcnt1)
+
+@app.route('/process',methods=['POST','GET'])
+def process():
+    vid=""
+    pg="0"
+    act="1"
+    uname=""
+    #if 'username' in session:
+    #    uname = session['username']
+    ff2=open("un.txt","r")
+    uname=ff2.read()
+    ff2.close()
+    value=[]
+    shutil.copy('static/faces/f1.jpg', 'static/f1.jpg')
+    cursor = mydb.cursor()
+    cursor.execute('SELECT * FROM register WHERE card = %s', (uname, ))
+    account = cursor.fetchone()
+    name=account[1]
+    mobile=account[3]
+    
+    email=account[4]
+    vid=account[0]
+    cursor.execute("SELECT vface FROM vt_face where vid=%s limit 0,1",(vid, ))
+    value = cursor.fetchone()[0]
+        
+    
+    return render_template('process.html', vid=vid,pg=pg,act=act,result=value)
+
+@app.route('/pro',methods=['POST','GET'])
+def pro():
+    vid=""
+    value=[]
+    pgg=0
+    act="1"
+    uname=""
+    #if 'username' in session:
+    #    uname = session['username']
+    ff2=open("un.txt","r")
+    uname=ff2.read()
+    ff2.close()
+    if request.method=='GET':
+        act = request.args.get('act')
+    
+        vid = request.args.get('vid')
+        pg = request.args.get('pg')
+        #pgg=int(pg)+1
+        pgg=2
+        mycursor = mydb.cursor()
+        mycursor.execute("SELECT count(*) FROM vt_face where vid=%s",(vid,))
+        dtt = mycursor.fetchone()[0]
+        
+        if dtt<=pgg:
+            act="1"
+        else:
+            act="2"
+        
+        mycursor.execute("SELECT vface FROM vt_face where vid=%s limit 0,1",(vid, ))
+        value = mycursor.fetchone()[0]
+        #print(value)
+        
+    return render_template('pro.html', result=value,vid=vid,pg=pgg,act=act)
+
+@app.route('/verify_face2',methods=['POST','GET'])
+def verify_face2():
+    msg=""
+    ss=""
+    uname=""
+    mess=""
+    act=""
+    if request.method=='GET':
+        act = request.args.get('act')
+        
+    #if 'username' in session:
+    #    uname = session['username']
+    ff2=open("un.txt","r")
+    uname=ff2.read()
+    ff2.close()
+
+    ff2=open("bc.txt","r")
+    bc=ff2.read()
+    ff2.close()
+
+    ff2=open("facest.txt","r")
+    fst=ff2.read()
+    ff2.close()
+    
+    cursor = mydb.cursor()
+    cursor.execute('SELECT * FROM register WHERE card = %s', (uname, ))
+    account = cursor.fetchone()
+    id1=str(account[0])
+    name=account[1]
+    mobile=account[3]
+    print(mobile)
+    email=account[4]
+    vid=account[0]
+    
+    
+    shutil.copy('static/faces/f1.jpg', 'faces/s1.jpg')
+    cutoff=5
+    img="v"+str(vid)+".jpg"
+    '''cursor.execute('SELECT * FROM vt_face WHERE vid = %s', (vid, ))
+    dt = cursor.fetchall()
+    for rr in dt:
+        hash0 = imagehash.average_hash(Image.open("static/frame/"+rr[2])) 
+        hash1 = imagehash.average_hash(Image.open("faces/s1.jpg"))
+        cc1=hash0 - hash1
+        print("cc="+str(cc1))
+        if cc1<=cutoff:
+            ss="ok"
+            break
+        else:
+            ss="no"'''
+
+    
+    if id1==fst:
+        act="2"
+        msg="Face Verified"
+        print("correct person")
+        return redirect(url_for('userhome', msg=msg))
+    else:
+        act="1"
+        msg="Unknown Face Found"
+        print("wrong person")
+        #xn=randint(1000, 9999)
+        #otp=str(xn)
+        
+        #cursor1 = mydb.cursor()
+        #cursor1.execute('update register set otp=%s WHERE card = %s', (otp, uname))
+        #mydb.commit()
+
+        mess="Someone Access your account"
+        url2="http://localhost/atm1/img.txt"
+        ur = urlopen(url2)#open url
+        data1 = ur.read().decode('utf-8')
+
+       
+        #idd=int(data1)+1
+        #url="http://iotcloud.co.in/testsms/sms.php?sms=link12&name="+name+"&mess="+mess+"&mobile="+str(mobile)+"&bc="+bc
+        #print(url)
+        #webbrowser.open_new(url)
+            
+                
+    return render_template('verify_face2.html',msg=msg,act=act,mess=mess,mobile=mobile,name=name,bc=bc)
+
+@app.route('/cap',methods=['POST','GET'])
+def cap():
+    msg=""
+
+    ff2=open("bc.txt","r")
+    bc=ff2.read()
+    ff2.close()
+
+    
+    
+    return render_template('cap.html',msg=msg,bc=bc)
+
+@app.route('/verify',methods=['POST','GET'])
+def verify():
+    msg=""
+    data1=""
+    #act=""
+    amtt=""
+    cc=""
+    name=""
+    mobile=""
+    mess=""
+    ff2=open("un.txt","r")
+    uname=ff2.read()
+    ff2.close()
+    #data1="4"
+
+    ff2=open("bc.txt","r")
+    bc=ff2.read()
+    ff2.close()
+
+    logfn=bc+".txt"
+    
+    url2="http://localhost/atm1/"+logfn
+    ur = urlopen(url2)#open url
+    data1 = ur.read().decode('utf-8')
+    vv=data1.split('-')
+    data1=vv[0]
+    amtt=vv[1]
+    print(data1)
+    
+    act = request.args.get('act')
+    if act is None:
+        act=""
+    
+    print("act="+str(act))
+    if data1=="accept":
+        act="1"
+
+    mycursor = mydb.cursor()
+    mycursor.execute("SELECT * FROM register where card=%s",(uname, ))
+    value = mycursor.fetchone()
+  
+    
+    if act=="3":
+        amt=0
+        amt1=0
+        amt2=0
+    
+        
+        amount1=amtt
+        
+       
+        mycursor.execute("SELECT amount FROM admin where username='admin'")
+        amt1 = mycursor.fetchone()[0]
+
+        mycursor.execute("SELECT deposit FROM register where card=%s",(uname, ))
+        amt2 = mycursor.fetchone()[0]
+
+        mycursor.execute("SELECT * FROM register where card=%s",(uname, ))
+        ddt = mycursor.fetchone()
+        name=ddt[1]
+        mobile=ddt[3]
+
+        amt=int(amount1)
+        if amt<=amt1:
+
+            if amt<=amt2:
+                #mycursor.execute("UPDATE admin SET amount=amount-%s WHERE username='admin'",(amount1, ))
+                #mydb.commit()
+                mycursor.execute("UPDATE register SET deposit=deposit-%s WHERE card=%s",(amount1, uname))
+                mydb.commit()
+
+                now = datetime.datetime.now()
+                rdate=now.strftime("%d-%m-%Y")
+                mycursor.execute("SELECT max(id)+1 FROM event")
+                maxid = mycursor.fetchone()[0]
+                if maxid is None:
+                    maxid=1
+                sql = "INSERT INTO event(id, name, accno, amount, rdate) VALUES (%s, %s, %s, %s, %s)"
+                val = (maxid, name, uname, amt, rdate)
+                mycursor.execute(sql, val)
+                mydb.commit()
+
+                mess="Amount Debited Rs."+str(amt)
+                url="http://iotcloud.co.in/testsms/sms.php?sms=msg&name="+name+"&mess="+mess+"&mobile="+str(mobile)
+                webbrowser.open_new(url)
+            
+                msg="Withdraw success..."
+            else:
+                mess="Your Account balance is low!"
+                #url="http://iotcloud.co.in/testsms/sms.php?sms=emr&name="+name+"&mess="+mess+"&mobile="+str(mobile)
+                #webbrowser.open_new(url)
+                msg="Your Account balance is low!"
+        else:
+            msg="Cash is not available in ATM!!"
+    
+        
+    return render_template('verify.html',msg=msg,act=act,amtt=amtt,data1=data1,name=name,mobile=mobile,mess=mess,value=value)
+
+
+@app.route('/otp', methods=['GET', 'POST'])
+def otp():
+    msg=""
+    key=""
+    if 'username' in session:
+        uname = session['username']
+    cursor = mydb.cursor()
+    cursor.execute('SELECT otp FROM register WHERE card = %s', (uname, ))
+    account = cursor.fetchone()[0]
+    key=account
+    
+    if request.method=='POST':
+        otp=request.form['otp']
+        
+        if otp==key:
+            session['username'] = uname
+            
+            return redirect(url_for('verify_aadhar'))
+        else:
+            msg = 'OTP wrong!'
+    return render_template('otp.html',msg=msg,key=key)
+
+@app.route('/atm_balance',methods=['POST','GET'])
+def atm_balance():
+    msg=""
+    ff2=open("un.txt","r")
+    uname=ff2.read()
+    ff2.close()
+
+    cursor = mydb.cursor()
+    if request.method=='POST':
+        amount=request.form['amount']
+        cursor.execute("UPDATE admin SET amount=%s WHERE username='admin'",(amount, ))
+        mydb.commit()
+        return redirect(url_for('admin'))
+
+        
+    
+    cursor.execute("SELECT amount FROM admin WHERE username='admin'")
+    value = cursor.fetchone()[0]
+    
+    return render_template('atm_balance.html',msg=msg,value=value)
+
+@app.route('/withdraw',methods=['POST','GET'])
+def withdraw():
+    uname=""
+    ##if 'username' in session:
+    #    uname = session['username']
+    #    accno = session['accno']
+    ff2=open("un.txt","r")
+    uname=ff2.read()
+    ff2.close()
+    mycursor = mydb.cursor()
+    mycursor.execute("SELECT * FROM register where card=%s",(uname, ))
+    value = mycursor.fetchone()
+    st="" 
+    msg=""
+    amt=0
+    amt1=0
+    amt2=0
+    name=""
+    mobile=""
+    mess=""
+    if request.method=='POST':
+        
+        amount1=request.form['amount']
+        
+        
+
+        mycursor.execute("SELECT amount FROM admin where username='admin'")
+        amt1 = mycursor.fetchone()[0]
+
+        mycursor.execute("SELECT deposit FROM register where card=%s",(uname, ))
+        amt2 = mycursor.fetchone()[0]
+
+        mycursor.execute("SELECT * FROM register where card=%s",(uname, ))
+        ddt = mycursor.fetchone()
+        name=ddt[1]
+        mobile=ddt[3]
+
+        amt=int(amount1)
+        if amt<=amt1:
+
+            if amt<=amt2:
+                #mycursor.execute("UPDATE admin SET amount=amount-%s WHERE username='admin'",(amount1, ))
+                #mydb.commit()
+                mycursor.execute("UPDATE register SET deposit=deposit-%s WHERE card=%s",(amount1, uname))
+                mydb.commit()
+
+                now = datetime.datetime.now()
+                rdate=now.strftime("%d-%m-%Y")
+                mycursor.execute("SELECT max(id)+1 FROM event")
+                maxid = mycursor.fetchone()[0]
+                if maxid is None:
+                    maxid=1
+                sql = "INSERT INTO event(id, name, accno, amount, rdate) VALUES (%s, %s, %s, %s, %s)"
+                val = (maxid, name, uname, amt, rdate)
+                mycursor.execute(sql, val)
+                mydb.commit()
+
+                mess="Amount Debited Rs."+str(amt)
+                #url="http://iotcloud.co.in/testsms/sms.php?sms=emr&name="+name+"&mess="+mess+"&mobile="+str(mobile)
+                #webbrowser.open_new(url)
+                st="1"
+                msg="Withdraw success..."
+            else:
+                st="2"
+                msg="Your Account balance is low!"
+        else:
+            st="3"
+            msg="Cash is not available in ATM!!"
+        
+    return render_template('withdraw.html',msg=msg,name=name,mobile=mobile,mess=mess,value=value,st=st)
+
+
+@app.route('/balance')
+def balance():
+    uname=""
+    #if 'username' in session:
+    #    uname = session['username']
+    #    accno = session['accno']
+    ff2=open("un.txt","r")
+    uname=ff2.read()
+    ff2.close()
+    mycursor = mydb.cursor()
+    mycursor.execute("SELECT * FROM register where card=%s",(uname, ))
+    value = mycursor.fetchone()
+    
+    
+    mycursor.execute("SELECT * FROM register where card=%s",(uname, ))
+    data = mycursor.fetchone()
+    deposit=data[9]
+    print(str(deposit))
+    return render_template('balance.html', data=deposit,value=value)
+
+
+
+@app.route('/user_view')
+def user_view():
+    mycursor = mydb.cursor()
+    mycursor.execute("SELECT * FROM register")
+    result = mycursor.fetchall()
+    return render_template('user_view.html', result=result)
+
+@app.route('/view_withdraw')
+def view_withdraw():
+    mycursor = mydb.cursor()
+    mycursor.execute("SELECT * FROM event order by id desc")
+    result = mycursor.fetchall()
+    return render_template('view_withdraw.html', result=result)
 
 @app.route('/logout')
 def logout():
